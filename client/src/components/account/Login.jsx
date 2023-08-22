@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import { useState, useContext } from "react";
 import { TextField, Box, Button, Typography, styled } from "@mui/material";
+import { useNavigate } from 'react-router-dom';
+
 import { API } from "../../service/api";
+
+import { DataContext } from '../../context/DataProvider';
+
 const Component = styled(Box)`
   width: 400px;
   margin: auto;
@@ -50,12 +55,12 @@ const Text = styled(Typography)`
 `;
 
 const Error = styled(Typography)`
-    font-size: 10px;
-    color: #ff6161;
-    line-height: 0;
-    margin-top: 10px;
-    font-weight: 600;
-`
+  font-size: 10px;
+  color: #ff6161;
+  line-height: 0;
+  margin-top: 10px;
+  font-weight: 600;
+`;
 
 const loginInitialValues = {
   username: "",
@@ -67,12 +72,17 @@ const signupInitialValues = {
   username: "",
   password: "",
 };
-const Login = () => {
+const Login = ({isUserAuthenticated}) => {
   const [login, setLogin] = useState(loginInitialValues);
   const [signup, setSignup] = useState(signupInitialValues);
   const [account, toggleAccount] = useState("login");
-  const [error, setError] = useState('');
-  const imageURL ="https://www.sesta.it/wp-content/uploads/2021/03/logo-blog-sesta-trasparente.png";
+  const [error, setError] = useState("");
+  
+  const navigate = useNavigate();
+  const { setAccount } = useContext(DataContext);
+
+  const imageURL =
+    "https://www.sesta.it/wp-content/uploads/2021/03/logo-blog-sesta-trasparente.png";
 
   const onValueChange = (e) => {
     setLogin({ ...login, [e.target.name]: e.target.value });
@@ -82,17 +92,40 @@ const Login = () => {
     setSignup({ ...signup, [e.target.name]: e.target.value });
   };
 
+  const loginUser = async () => {
+    let response = await API.userLogin(login);
+    if (response.isSuccess) {
+      setError("");
+
+      sessionStorage.setItem(
+        "accessToken",
+        `Bearer ${response.data.accessToken}`
+      );
+      sessionStorage.setItem(
+        "refreshToken",
+        `Bearer ${response.data.refreshToken}`
+      );
+      setAccount({
+        name: response.data.name,
+        username: response.data.username,
+      });
+      isUserAuthenticated(true);
+      navigate("/");
+    } else {
+      setError("Something went wrong! please try again later");
+    }
+  };
+
   const signupUser = async () => {
     let response = await API.userSignup(signup);
-    if(response.isSuccess) {
-        setError('');
-        setSignup(signupInitialValues);
-        toggleAccount("login");
+    if (response.isSuccess) {
+      setError("");
+      setSignup(signupInitialValues);
+      toggleAccount("login");
+    } else {
+      setError("Something went wrong! Please try again later");
     }
-    else{
-        setError('Something went wrong! Please try again later')
-    }
-  }
+  };
 
   const toggleSignup = () => {
     account === "signup" ? toggleAccount("login") : toggleAccount("signup");
@@ -119,7 +152,7 @@ const Login = () => {
               label="Enter Password"
             />
             {error && <Error>{error}</Error>}
-            <LoginButton variant="contained">Login</LoginButton>
+            <LoginButton variant="contained" onClick={() => loginUser()} >Login</LoginButton>
             <Text style={{ textAlign: "center" }}>OR</Text>
             <SignupButton onClick={() => toggleSignup()}>
               Create an account
@@ -149,7 +182,7 @@ const Login = () => {
               label="Enter Password"
             />
             {error && <Error>{error}</Error>}
-            <SignupButton onClick={() => signupUser()} >Signup</SignupButton>
+            <SignupButton onClick={() => signupUser()}>Signup</SignupButton>
             <Text style={{ textAlign: "center" }}>OR</Text>
             <LoginButton variant="contained" onClick={() => toggleSignup()}>
               Already have an account
