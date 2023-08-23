@@ -35,6 +35,8 @@ const Heading = styled(Typography)`
 const Details = styled(Typography)`
   font-size: 14px;
   word-break: break-word;
+  text-align: justify;
+  margin: 5px;
 `;
 
 const Post = ({ post }) => {

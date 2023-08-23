@@ -1,25 +1,34 @@
-import styled from "@emotion/styled";
-import { Box, Button, TextareaAutosize } from "@mui/material";
-import { useContext, useState } from "react";
-import { DataContext } from "../../../context/DataProvider";
+
+import { useState, useEffect, useContext } from 'react';
+import { Box, TextareaAutosize, Button, styled } from '@mui/material';
+
+import { DataContext } from '../../../context/DataProvider';
+
+import { API } from '../../../service/api';
+
+//components
+import Comment from './Comment';
 
 const Container = styled(Box)`
-  margin-top: 100px;
-  display: flex;
+    margin-top: 100px;
+    display: flex;
 `;
+
 const Image = styled('img')({
     width: 50,
     height: 50,
     borderRadius: '50%'
 });
 
-
 const StyledTextArea = styled(TextareaAutosize)`
     height: 100px !important;
     width: 100%; 
     margin: 0 20px;
+    padding: 10px;
+    border: 1px solid #d3cede;
+    outline:none;
+    font-size: 20px;
 `;
-
 
 const initialValue = {
     name: '',
@@ -29,31 +38,73 @@ const initialValue = {
 }
 
 const Comments = ({ post }) => {
-  const url = "https://static.thenounproject.com/png/12017-200.png";
-  
-  const [comment, setcomment] = useState(initialValue);
+    const url = 'https://static.thenounproject.com/png/12017-200.png'
 
-  const { account } = useContext(DataContext);
-  return (
-    <Box>
-      <Container>
-        <Image src={url} alt="dp" />
-        <StyledTextArea 
-           minRows={5} 
-           placeholder="what's on your mind?"
-           value={comment.comments}
-        //    onChange={(e) => handleChange(e)} 
-         />
-        <Button
-          variant="contained"
-          color="primary"
-          size="medium"
-          style={{ height: 40 }}
-        >Post</Button>
-      </Container>
-      <Box></Box>
-    </Box>
-  );
-};
+    const [comment, setComment] = useState(initialValue);
+    const [comments, setComments] = useState([]);
+
+    const { account } = useContext(DataContext);
+    
+    const getComment = async () => {
+        const response = await API.getAllComments(post._id);
+        if (response.isSuccess) {
+            setComments(response.data);
+        }
+        
+    }
+    const handleChange = (e) => {
+        setComment({
+            ...comment,
+            name: account.username,
+            postId: post._id,
+            comments: e.target.value
+        });
+    }
+
+    const addComment = async() => {
+        await API.newComment(comment);
+        setComment(initialValue)
+        getComment();
+        
+    }
+    
+    return (
+        <Box>
+            <Container>
+                <Image src={url} alt="dp" />   
+                <StyledTextArea 
+                    rowsMin={5} 
+                    placeholder="what's on your mind?"
+                    onChange={(e) => handleChange(e)} 
+                    value={comment.comments}
+                />
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    size="medium" 
+                    style={{ height: 40 }}
+                    onClick={(e) => addComment(e)}
+                >Post</Button>             
+            </Container>
+            <Box>
+                {
+                    comments && comments.length > 0 ? 
+                    comments.map(comment => (
+                        <Comment comment={comment} getComment={getComment} />
+                    )):
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        fullWidth
+                        style={{ height: "40", margin: "14px 0px" }}
+                        onClick={() => getComment()}
+                    >
+                         Comments
+                    </Button>
+                }
+            </Box>
+        </Box>
+    )
+}
 
 export default Comments;

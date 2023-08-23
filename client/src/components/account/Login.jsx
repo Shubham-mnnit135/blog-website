@@ -13,7 +13,7 @@ const Component = styled(Box)`
 `;
 
 const Image = styled("img")({
-  width: 100,
+  width: 300,
   display: "flex",
   margin: "auto",
   padding: "50px 0 0",
@@ -81,9 +81,7 @@ const Login = ({isUserAuthenticated}) => {
   const navigate = useNavigate();
   const { setAccount } = useContext(DataContext);
 
-  const imageURL =
-    "https://www.sesta.it/wp-content/uploads/2021/03/logo-blog-sesta-trasparente.png";
-
+  
   const onValueChange = (e) => {
     setLogin({ ...login, [e.target.name]: e.target.value });
   };
@@ -134,7 +132,7 @@ const Login = ({isUserAuthenticated}) => {
   return (
     <Component>
       <Box>
-        <Image src={imageURL} alt="login" />
+        <Image src="/welcome3.png" alt="login" />
         {account === "login" ? (
           <Wrapper>
             <TextField
