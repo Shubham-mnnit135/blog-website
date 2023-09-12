@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { Box, TextareaAutosize, Button, styled } from '@mui/material';
 
 import { DataContext } from '../../../context/DataProvider';
@@ -89,8 +89,8 @@ const Comments = ({ post }) => {
             <Box>
                 {
                     comments && comments.length > 0 ? 
-                    comments.map(comment => (
-                        <Comment comment={comment} getComment={getComment} />
+                    comments.map((comment,indx) => (
+                        <Comment key={indx}  comment={comment} getComment={getComment} />
                     )):
                     <Button 
                         variant="contained" 

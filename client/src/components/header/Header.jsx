@@ -18,9 +18,12 @@ const Container = styled(Toolbar)`
     }
 `
 
+
 const Header = () => {
 
-
+    const logout = () => {
+        sessionStorage.clear();
+    }
         
     return (
         <Component>
@@ -28,7 +31,7 @@ const Header = () => {
                 <Link to='/'>HOME</Link>
                 <Link to='/about'>ABOUT</Link>
                 <Link to='/contact'>CONTACT</Link>
-                <Link to='/login'>LOGOUT</Link>
+                <Link to='/login' replace  onClick={logout}>LOGOUT</Link>
             </Container>
         </Component>
     )

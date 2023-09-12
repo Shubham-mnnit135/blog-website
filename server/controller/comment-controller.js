@@ -16,10 +16,10 @@ export const newComment = async (request, response) => {
 export const getComments = async (request, response) => {
     try {
         const comments = await Comment.find({ postId: request.params.id });
-        console.log("i : ",comments);
+        // console.log("i : ",comments);
         response.status(200).json(comments);
     } catch (error) {
-        console.log('reject');
+        // console.log('reject');
         response.status(500).json({error:error.message})
     }
 }
